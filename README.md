@@ -30,6 +30,6 @@ To set up this project:
 Clone the repository.
 Install dependencies using pip install -r requirements.txt from the root directory.
 
-## 🐍 Python Version
+## 🐍 Python Version
 
 This project is built with Python 3.11.1.
