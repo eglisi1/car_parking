@@ -28,7 +28,7 @@ Thanks to [Cookie Cutter](https://drivendata.github.io/cookiecutter-data-science
 To set up this project:
 
 Clone the repository.
-Install dependencies using pip install -r requirements.txt from the root directory.
+Install dependencies using ```bash pip install -r requirements.txt``` from the root directory.
 
 ## 🐍 Python Version
 
