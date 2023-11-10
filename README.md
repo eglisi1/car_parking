@@ -27,8 +27,10 @@ Thanks to [Cookie Cutter](https://drivendata.github.io/cookiecutter-data-science
 
 To set up this project:
 
-Clone the repository.
-Install dependencies using ```pip install -r requirements.txt``` from the root directory.
+1. Clone the repository.
+2. Install dependencies using ```pip install -r requirements.txt``` from the root directory.
+3. Start the app with uvicorn ```uvicorn main:app --reload``` from the src/backend directory.
+4. Profit 💰
 
 ## 🐍 Python Version
 
