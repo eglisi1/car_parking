@@ -1,6 +1,7 @@
 import requests
 from requests.exceptions import RequestException
 import base64
+import datetime
 
 from model.predict_response import PredictResponse
 
@@ -24,6 +25,10 @@ def validate_base64(photo_base64: str):
 def send_photo_to_api(photo_base64: str) -> PredictResponse:
     """Send a photo to the API and return the response."""
     validate_base64(photo_base64)
+
+    ct = datetime.datetime.now()
+
+    return PredictResponse(photo_base64=photo_base64, instructions="cat " + ct.strftime("%Y%m%d:%H%M%S"))
     try:
         response = requests.post(api_url, json={"photo_base64": photo_base64})
         response.raise_for_status()

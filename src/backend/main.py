@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from model.predict_response import PredictResponse
 from model.predict_request import PredictRequest
@@ -7,6 +8,13 @@ from services import predict_service
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root() -> str:
@@ -15,7 +23,7 @@ def read_root() -> str:
 
 @app.put("/predict")
 def predict(request: PredictRequest) -> PredictResponse:
-    print(f"Request: {request}")
+    print("Access to /predict")
     try:
         return predict_service.send_photo_to_api(request.photo_base64)
     except ValueError as e:
