@@ -3,14 +3,22 @@ from datetime import datetime
 import logging
 
 import services.db_service as db_service
+from services.db_service import MongoDBClient
 import services.plot_service as plot_service
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+mongo_client = MongoDBClient()
+try:
+    mongo_client.connect()
+except Exception as e:
+    logger.error(f"Failed to connect to MongoDB: {e}")
+    exit(1)
+
 
 def occupancy_trends(date_from: datetime, date_to: datetime) -> str:
-    documents = db_service.get_documents_in_range(date_from, date_to)
+    documents = db_service.get_documents_in_range(mongo_client.collection, date_from, date_to)
     total_parkingspots = len(documents[0]["parkingSpots"]) if documents else 0
     day_period_data = defaultdict(
         lambda: {"total_occupied": 0, "count": 0}
@@ -47,11 +55,13 @@ def occupancy_trends(date_from: datetime, date_to: datetime) -> str:
         for datum, daten in night_period_data.items()
     ]
 
-    return plot_service.create_plot_occupancy_trends(day_persiod_average, night_period_average)
+    return plot_service.create_plot_occupancy_trends(
+        day_persiod_average, night_period_average
+    )
 
 
 def occupancy_per_day(date_from: datetime, date_to: datetime) -> str:
-    documents = db_service.get_documents_in_range(date_from, date_to)
+    documents = db_service.get_documents_in_range(mongo_client.collection, date_from, date_to)
     average_per_day = calculate_average_per_day(documents)
     return plot_service.create_plot_occupancy_per_day(average_per_day)
 
@@ -102,17 +112,20 @@ def calculate_average_per_day(documents):
 
     return average_per_weekday
 
+
 def occupancy_hours_by_parkingspace(date_from: datetime, date_to: datetime) -> str:
-    documents = db_service.get_documents_in_range(date_from, date_to)
+    documents = db_service.get_documents_in_range(mongo_client.collection, date_from, date_to)
     occupancy_hours = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
 
     for doc in documents:
-        for spot in doc['parkingSpots']:
-            if spot['status'] == 'Belegt':
-                occupancy_hours[spot['parkingSpotId']] += 0.25  # Jeder Eintrag entspricht 15 Minuten
+        for spot in doc["parkingSpots"]:
+            if spot["status"] == "Belegt":
+                occupancy_hours[
+                    spot["parkingSpotId"]
+                ] += 0.25  # Jeder Eintrag entspricht 15 Minuten
 
     # Umrechnen in Stunden
     for spot_id in occupancy_hours:
         occupancy_hours[spot_id] /= 4  # 4*15 Minuten = 1 Stunde
-    
+
     return plot_service.create_plot_occupancy_hours_by_parkingspace(occupancy_hours)
