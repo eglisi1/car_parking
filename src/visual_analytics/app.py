@@ -46,7 +46,7 @@ except Exception as e:
     exit(1)
 
 
-def create_plot(trends: set) -> str:
+def create_plot(trends: dict) -> str:
     x_axis = list(trends.keys())
     y_axis = [sum(counts) / len(counts) for counts in trends.values()]
     plt.figure(figsize=(10, 6))
