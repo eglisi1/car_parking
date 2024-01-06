@@ -1,9 +1,16 @@
+import matplotlib
+
+matplotlib.use("Agg")  # Use a non-interactive backend
+
 from flask import Flask, render_template, request
 from pymongo import MongoClient
+import matplotlib.pyplot as plt
 
 import logging
 import datetime
 import os
+from io import BytesIO
+import base64
 
 app = Flask(__name__)
 
@@ -11,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def load_env_variable(var_name):
+def load_env_variable(var_name: str) -> str:
     value = os.getenv(var_name)
     if value is None:
         logger.error(f"Environment variable '{var_name}' not found.")
@@ -39,14 +46,30 @@ except Exception as e:
     exit(1)
 
 
+def create_plot(trends: set) -> str:
+    x_axis = list(trends.keys())
+    y_axis = [sum(counts) / len(counts) for counts in trends.values()]
+    plt.figure(figsize=(10, 6))
+    plt.plot(x_axis, y_axis, label="Occupancy", color="blue")
+    plt.xlabel("Timestamp")
+    plt.ylabel("Average Occupancy")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    buf = BytesIO()
+    plt.savefig(buf, format="png")
+    plt.close()
+    return base64.b64encode(buf.getbuffer()).decode("ascii")
+
+
 @app.route("/")
-def index():
+def index() -> str:
     return render_template("index.html")
 
 
 @app.route("/occupancy_trends")
-def occupancy_trends():
-    timedelta_days = request.args.get('timedelta', default=7, type=int)
+def occupancy_trends() -> str:
+    timedelta_days = request.args.get("timedelta", default=7, type=int)
     start_time = datetime.datetime.now() - datetime.timedelta(days=timedelta_days)
     data = collection.find({"timestamp": {"$gte": start_time.isoformat()}})
 
@@ -58,8 +81,8 @@ def occupancy_trends():
         )
         trends.setdefault(time_key, []).append(occupied_count)
 
-    avg_occupancy = {time: sum(counts) / len(counts) for time, counts in trends.items()}
-    return render_template("occupancy_trends.html", data=avg_occupancy)
+    base64_plot = create_plot(trends)
+    return render_template("occupancy_trends.html", plot_url=base64_plot)
 
 
 if __name__ == "__main__":
