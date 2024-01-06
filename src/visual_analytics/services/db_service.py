@@ -3,6 +3,7 @@ from pymongo.collection import Collection
 
 import logging
 import os
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,3 +38,13 @@ except Exception as e:
 
 def get_collection() -> Collection:
     return collection
+
+def get_documents_in_range(date_from: datetime, date_to: datetime):
+    return collection.find(
+        {
+            "timestamp": {
+                "$gte": date_from.strftime("%Y-%m-%dT%H:%M:%S"),
+                "$lt": date_to.strftime("%Y-%m-%dT%H:%M:%S"),
+            }
+        }
+    )

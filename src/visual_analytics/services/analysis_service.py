@@ -1,21 +1,19 @@
-from pymongo.collection import Collection
-
 from collections import defaultdict
 from datetime import datetime
 import logging
 
+import services.db_service as db_service
 import services.plot_service as plot_service
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def occupancy_trends(collection: Collection, timedelta_days=7) -> str:
-    start_time = datetime.datetime.now() - datetime.timedelta(days=timedelta_days)
-    data = collection.find({"timestamp": {"$gte": start_time.isoformat()}})
+def occupancy_trends(date_from: datetime, date_to: datetime) -> str:
+    documents = db_service.get_documents_in_range(date_from, date_to)
 
     trends = {}
-    for entry in data:
+    for entry in documents:
         time_key = entry["timestamp"][:13]  # Group by hour
         occupied_count = sum(
             1 for spot in entry["parkingSpots"] if spot["status"] == "Belegt"
@@ -25,17 +23,8 @@ def occupancy_trends(collection: Collection, timedelta_days=7) -> str:
     return plot_service.create_plot_occupancy_trends(trends)
 
 
-def occupancy_per_day(
-    collection: Collection, date_from: datetime, date_to: datetime
-) -> str:
-    documents = collection.find(
-        {
-            "timestamp": {
-                "$gte": date_from.strftime("%Y-%m-%dT%H:%M:%S"),
-                "$lt": date_to.strftime("%Y-%m-%dT%H:%M:%S"),
-            }
-        }
-    )
+def occupancy_per_day(date_from: datetime, date_to: datetime) -> str:
+    documents = db_service.get_documents_in_range(date_from, date_to)
     average_per_day = calculate_average_per_day(documents)
     return plot_service.create_plot_occupancy_per_day(average_per_day)
 
