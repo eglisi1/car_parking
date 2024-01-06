@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from pymongo import MongoClient
 
 import logging
@@ -7,12 +7,10 @@ import os
 
 app = Flask(__name__)
 
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# Load Environment Variables
 def load_env_variable(var_name):
     value = os.getenv(var_name)
     if value is None:
@@ -41,9 +39,15 @@ except Exception as e:
     exit(1)
 
 
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
 @app.route("/occupancy_trends")
 def occupancy_trends():
-    start_time = datetime.datetime.now() - datetime.timedelta(days=7)
+    timedelta_days = request.args.get('timedelta', default=7, type=int)
+    start_time = datetime.datetime.now() - datetime.timedelta(days=timedelta_days)
     data = collection.find({"timestamp": {"$gte": start_time.isoformat()}})
 
     trends = {}
@@ -55,8 +59,6 @@ def occupancy_trends():
         trends.setdefault(time_key, []).append(occupied_count)
 
     avg_occupancy = {time: sum(counts) / len(counts) for time, counts in trends.items()}
-
-    # Render the HTML template with data
     return render_template("occupancy_trends.html", data=avg_occupancy)
 
 
