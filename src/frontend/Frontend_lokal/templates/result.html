@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+        form {
+            text-align: center;
+        }
+        img {
+            width: 400px; /* Passen Sie die Größe nach Bedarf an */
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <img src="data:image/png;base64,{{ image_data }}">
+</body>
+</html>

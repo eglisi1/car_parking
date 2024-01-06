@@ -40,7 +40,7 @@ def check_and_save(detections):
     }
 
     username = 'carpark'
-    password = 'mw6QHJu3Rtxgk17D'
+    password = 'x'
     host = 'parkinglot.yba45ot.mongodb.net'
     database_name = 'parkinglot'
     collection_name = 'data'
@@ -52,9 +52,6 @@ def check_and_save(detections):
 model_output = [
     {'xmin': 262, 'ymin': 335, 'xmax': 516, 'ymax': 443},
     {'xmin': 267, 'ymin': 128, 'xmax': 502, 'ymax': 243}, 
-    {'xmin': 238, 'ymin': 532, 'xmax': 507, 'ymax': 661}, 
-    {'xmin': 833, 'ymin': 561, 'xmax': 1104, 'ymax': 686}, 
-    {'xmin': 821, 'ymin': 328, 'xmax': 1071, 'ymax': 448}, 
     {'xmin': 810, 'ymin': 146, 'xmax': 1038, 'ymax': 253}
 ]
 
