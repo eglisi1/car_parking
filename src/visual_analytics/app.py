@@ -1,14 +1,9 @@
 from flask import Flask, render_template, request
 
-import logging
-
 import services.analysis_service as analysis_service
 import services.db_service as db_service
 
 app = Flask(__name__)
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 @app.route("/")
 def index() -> str:
