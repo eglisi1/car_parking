@@ -11,43 +11,43 @@ logger = logging.getLogger(__name__)
 
 def occupancy_trends(date_from: datetime, date_to: datetime) -> str:
     documents = db_service.get_documents_in_range(date_from, date_to)
-    gesamt_parkplätze = len(documents[0]["parkingSpots"]) if documents else 0
-    zeitraum1_daten = defaultdict(
-        lambda: {"gesamt_belegt": 0, "zählung": 0}
+    total_parkingspots = len(documents[0]["parkingSpots"]) if documents else 0
+    day_period_data = defaultdict(
+        lambda: {"total_occupied": 0, "count": 0}
     )  # 07:00-19:00
-    zeitraum2_daten = defaultdict(
-        lambda: {"gesamt_belegt": 0, "zählung": 0}
+    night_period_data = defaultdict(
+        lambda: {"total_occupied": 0, "count": 0}
     )  # 19:00:01-06:59:59
 
     for doc in documents:
         timestamp = datetime.strptime(doc["timestamp"], "%Y-%m-%dT%H:%M:%S")
-        datum = timestamp.date()
-        uhrzeit = timestamp.time()
+        datee = timestamp.date()
+        timee = timestamp.time()
 
-        belegte_plätze = sum(spot["status"] == "Belegt" for spot in doc["parkingSpots"])
+        occupied_spots = sum(spot["status"] == "Belegt" for spot in doc["parkingSpots"])
 
         # Überprüfe, zu welchem Zeitraum der Zeitstempel gehört, und aktualisiere entsprechend
         if (
-            uhrzeit >= datetime.strptime("07:00", "%H:%M").time()
-            and uhrzeit <= datetime.strptime("19:00", "%H:%M").time()
+            timee >= datetime.strptime("07:00", "%H:%M").time()
+            and timee <= datetime.strptime("19:00", "%H:%M").time()
         ):
-            zeitraum1_daten[datum]["gesamt_belegt"] += belegte_plätze
-            zeitraum1_daten[datum]["zählung"] += 1
+            day_period_data[datee]["total_occupied"] += occupied_spots
+            day_period_data[datee]["count"] += 1
         else:
-            zeitraum2_daten[datum]["gesamt_belegt"] += belegte_plätze
-            zeitraum2_daten[datum]["zählung"] += 1
+            night_period_data[datee]["total_occupied"] += occupied_spots
+            night_period_data[datee]["count"] += 1
 
     # Berechne die durchschnittliche Belegungsrate für beide Zeiträume
-    zeitraum1_durchschnitt = [
-        (datum, (daten["gesamt_belegt"] / (gesamt_parkplätze * daten["zählung"])) * 100)
-        for datum, daten in zeitraum1_daten.items()
+    day_persiod_average = [
+        (datum, (daten["total_occupied"] / (total_parkingspots * daten["count"])) * 100)
+        for datum, daten in day_period_data.items()
     ]
-    zeitraum2_durchschnitt = [
-        (datum, (daten["gesamt_belegt"] / (gesamt_parkplätze * daten["zählung"])) * 100)
-        for datum, daten in zeitraum2_daten.items()
+    night_period_average = [
+        (datum, (daten["total_occupied"] / (total_parkingspots * daten["count"])) * 100)
+        for datum, daten in night_period_data.items()
     ]
 
-    return plot_service.create_plot_occupancy_trends(zeitraum1_durchschnitt, zeitraum2_durchschnitt)
+    return plot_service.create_plot_occupancy_trends(day_persiod_average, night_period_average)
 
 
 def occupancy_per_day(date_from: datetime, date_to: datetime) -> str:
