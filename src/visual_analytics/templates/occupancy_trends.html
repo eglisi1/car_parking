@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Occupancy Trends</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <canvas id="occupancyChart" width="400" height="200"></canvas>
+    <script>
+        // Assuming 'data' is passed from Flask as a JSON string
+        const occupancyData = {{ data| tojson }};
+        const ctx = document.getElementById('occupancyChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line', // or 'bar'
+            data: {
+                labels: Object.keys(occupancyData),
+                datasets: [{
+                    label: 'Occupancy',
+                    data: Object.values(occupancyData),
+                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

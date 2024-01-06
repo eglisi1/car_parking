@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, render_template
 from pymongo import MongoClient
 
 import logging
@@ -43,13 +43,9 @@ except Exception as e:
 
 @app.route("/occupancy_trends")
 def occupancy_trends():
-    # Define the time range for analysis, e.g., the last week
     start_time = datetime.datetime.now() - datetime.timedelta(days=7)
-
-    # Query to fetch data
     data = collection.find({"timestamp": {"$gte": start_time.isoformat()}})
 
-    # Process and aggregate data
     trends = {}
     for entry in data:
         time_key = entry["timestamp"][:13]  # Group by hour
@@ -58,10 +54,10 @@ def occupancy_trends():
         )
         trends.setdefault(time_key, []).append(occupied_count)
 
-    # Calculate average occupancy per hour (or chosen time period)
     avg_occupancy = {time: sum(counts) / len(counts) for time, counts in trends.items()}
 
-    return jsonify(avg_occupancy)
+    # Render the HTML template with data
+    return render_template("occupancy_trends.html", data=avg_occupancy)
 
 
 if __name__ == "__main__":
