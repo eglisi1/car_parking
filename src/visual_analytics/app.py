@@ -34,5 +34,13 @@ def occupancy_per_day() -> str:
     base64_plot = analysis_service.occupancy_per_day(date_from, date_to)
     return render_template("occupancy_per_day_result.html", plot_url=base64_plot)
 
+@app.route("/occupancy_hours_by_parkingspace")
+def occupancy_hours_by_parkingspace() -> str:
+    logger.debug(f"/occupancy_hours_by_parkingspace called with args {request.args}")
+    date_from = util_service.parse_date(request.args.get("date_from", type=str), datetime.today() - timedelta(days=7))
+    date_to = util_service.parse_date(request.args.get("date_to", type=str), datetime.today())
+    base64_plot = analysis_service.occupancy_hours_by_parkingspace(date_from, date_to)
+    return render_template("occupancy_hours_by_parkingspace_result.html", plot_url=base64_plot)
+
 if __name__ == "__main__":
     app.run(debug=True)

@@ -101,3 +101,18 @@ def calculate_average_per_day(documents):
     }
 
     return average_per_weekday
+
+def occupancy_hours_by_parkingspace(date_from: datetime, date_to: datetime) -> str:
+    documents = db_service.get_documents_in_range(date_from, date_to)
+    occupancy_hours = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+
+    for doc in documents:
+        for spot in doc['parkingSpots']:
+            if spot['status'] == 'Belegt':
+                occupancy_hours[spot['parkingSpotId']] += 0.25  # Jeder Eintrag entspricht 15 Minuten
+
+    # Umrechnen in Stunden
+    for spot_id in occupancy_hours:
+        occupancy_hours[spot_id] /= 4  # 4*15 Minuten = 1 Stunde
+    
+    return plot_service.create_plot_occupancy_hours_by_parkingspace(occupancy_hours)

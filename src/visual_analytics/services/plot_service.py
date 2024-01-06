@@ -72,3 +72,13 @@ def create_plot_occupancy_per_day(average_per_day: dict) -> str:
     plt.tight_layout()
 
     return create_plot_from_plt(plt)
+
+def create_plot_occupancy_hours_by_parkingspace(occupancy_hours_by_parkingspace: dict) -> str:
+    plt.figure(figsize=(10, 6))
+    plt.bar(range(len(occupancy_hours_by_parkingspace)), list(occupancy_hours_by_parkingspace.values()), align='center')
+    plt.xticks(range(len(occupancy_hours_by_parkingspace)), list(occupancy_hours_by_parkingspace.keys()))
+    plt.title('Besetzungsstunden pro Parkplatz')
+    plt.xlabel('Parkplatz ID')
+    plt.ylabel('Stunden')
+
+    return create_plot_from_plt(plt)
