@@ -1,41 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <title>Parking Trends</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+{% block title %}
+Home
+{% endblock %}
 
-<body>
-    <h1>Parking Trends</h1>
+{% block content %}
+<div class="container">
+    <h1>Occupancy Trends</h1>
     <form id="trendsForm" action="" method="get">
         <div class="row">
             <div class="col-2">
-                <label for="timedelta">Time Delta (days):</label>
+                <label for="start_date">From Date:</label>
             </div>
             <div class="col-2">
-                <input type="number" id="timedelta" name="timedelta" min="7" value="7">
+                <input type="date" id="date_from" name="date_from" value="2023-01-05">
             </div>
-        </div>
-        <div class="row">
-            <div class="col-2">
-                <button type="button" onclick="submitForm('/occupancy_trends')">View Occupancy</button>
+            <div class="row">
+                <div class="col-2">
+                    <label for="start_date">To Date:</label>
+                </div>
+                <div class="col-2">
+                    <input type="date" id="date_to" name="date_to" value="2023-01-12">
+                </div>
+                <div class="row">
+                    <div class="col-2">
+                        <button type="button" onclick="submitForm('/occupancy_trends')">Occupancy Trend</button>
+                    </div>
+                    <div class="col-2">
+                        <button type="button" onclick="submitForm('/occupancy_per_day')">Occupancy per Day</button>
+                    </div>
+                </div>
             </div>
-            <div class="col-2">
-                <button type="button" onclick="submitForm('/')">View Other Trends</button>
-            </div>
-        </div>
     </form>
+</div>
 
-    <script>
-        function submitForm(action) {
-            var form = document.getElementById('trendsForm');
-            form.action = action;
-            form.submit();
-        }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+<script>
+    function submitForm(action) {
+        var form = document.getElementById('trendsForm');
+        form.action = action;
+        form.submit();
+    }
+</script>
+{% endblock %}

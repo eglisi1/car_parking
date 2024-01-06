@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}
+Occupancy per Day Result
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Occupancy per Day Result</h1>
+    <img src="data:image/png;base64,{{ plot_url }}" alt="Occupancy per Day Trends" class="img-fluid">
+</div>
+{% endblock %}
