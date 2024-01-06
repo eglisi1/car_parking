@@ -11,16 +11,43 @@ logger = logging.getLogger(__name__)
 
 def occupancy_trends(date_from: datetime, date_to: datetime) -> str:
     documents = db_service.get_documents_in_range(date_from, date_to)
+    gesamt_parkplätze = len(documents[0]["parkingSpots"]) if documents else 0
+    zeitraum1_daten = defaultdict(
+        lambda: {"gesamt_belegt": 0, "zählung": 0}
+    )  # 07:00-19:00
+    zeitraum2_daten = defaultdict(
+        lambda: {"gesamt_belegt": 0, "zählung": 0}
+    )  # 19:00:01-06:59:59
 
-    trends = {}
-    for entry in documents:
-        time_key = entry["timestamp"][:13]  # Group by hour
-        occupied_count = sum(
-            1 for spot in entry["parkingSpots"] if spot["status"] == "Belegt"
-        )
-        trends.setdefault(time_key, []).append(occupied_count)
+    for doc in documents:
+        timestamp = datetime.strptime(doc["timestamp"], "%Y-%m-%dT%H:%M:%S")
+        datum = timestamp.date()
+        uhrzeit = timestamp.time()
 
-    return plot_service.create_plot_occupancy_trends(trends)
+        belegte_plätze = sum(spot["status"] == "Belegt" for spot in doc["parkingSpots"])
+
+        # Überprüfe, zu welchem Zeitraum der Zeitstempel gehört, und aktualisiere entsprechend
+        if (
+            uhrzeit >= datetime.strptime("07:00", "%H:%M").time()
+            and uhrzeit <= datetime.strptime("19:00", "%H:%M").time()
+        ):
+            zeitraum1_daten[datum]["gesamt_belegt"] += belegte_plätze
+            zeitraum1_daten[datum]["zählung"] += 1
+        else:
+            zeitraum2_daten[datum]["gesamt_belegt"] += belegte_plätze
+            zeitraum2_daten[datum]["zählung"] += 1
+
+    # Berechne die durchschnittliche Belegungsrate für beide Zeiträume
+    zeitraum1_durchschnitt = [
+        (datum, (daten["gesamt_belegt"] / (gesamt_parkplätze * daten["zählung"])) * 100)
+        for datum, daten in zeitraum1_daten.items()
+    ]
+    zeitraum2_durchschnitt = [
+        (datum, (daten["gesamt_belegt"] / (gesamt_parkplätze * daten["zählung"])) * 100)
+        for datum, daten in zeitraum2_daten.items()
+    ]
+
+    return plot_service.create_plot_occupancy_trends(zeitraum1_durchschnitt, zeitraum2_durchschnitt)
 
 
 def occupancy_per_day(date_from: datetime, date_to: datetime) -> str:
