@@ -16,7 +16,7 @@
         const occupancyData = {{ data| tojson }};
         const ctx = document.getElementById('occupancyChart').getContext('2d');
         const chart = new Chart(ctx, {
-            type: 'line', // or 'bar'
+            type: 'line', 
             data: {
                 labels: Object.keys(occupancyData),
                 datasets: [{
