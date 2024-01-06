@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 import cv2
 import numpy as np
 import base64
@@ -69,9 +69,9 @@ def index():
                 starting_point = (1919, 2200)
                 image_bytes = draw_L_shaped_arrow('car_parking/notebooks/Parkplatz_overview.png', starting_point, parking_spots[nearest_spot])
                 image_encoded = base64.b64encode(image_bytes).decode('utf-8')  # Bild für HTML codieren
-                return render_template('result.html', image_data=image_encoded, title="Bitte parken Sie auf folgendem Parkfeld")
+                return render_template('result.html', image_data=image_encoded, title="Nächstgelegener Parkplatz")
             else:
-                return "Leider ist kein freier Parkplatz verfügbar."
+                return render_template('no_spot.html', message="Leider ist kein freier Parkplatz verfügbar.")
         except Exception as e:
             return f"Ein Fehler ist aufgetreten: {e}"
     else:
