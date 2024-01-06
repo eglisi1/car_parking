@@ -17,7 +17,7 @@ def index() -> str:
     return render_template("index.html")
 
 
-@app.route("/occupancy_trends")
+@app.route("/average_occupancy")
 def occupancy_trends() -> str:
     logger.debug(f"/occupancy_trends called with args {request.args}")
     date_from = util_service.parse_date(request.args.get("date_from", type=str), datetime.today() - timedelta(days=7))
