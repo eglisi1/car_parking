@@ -92,7 +92,7 @@ def check_and_save(detections):
 
     data_to_save = {
         '_id': ObjectId(),
-        'timestamp': datetime.now().isoformat(),
+        'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
         'parkingSpots': parking_status
     }
 
