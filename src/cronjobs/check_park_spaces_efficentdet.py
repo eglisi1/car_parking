@@ -124,10 +124,10 @@ def detect_objects(image):
 take_photo('/home/admin/photos/latest.jpg')
 
 # load the efficientdet model
-model = tf.saved_model.load('../models/efficientdet_d1_coco17_tpu-32/saved_model')
+# model = tf.saved_model.load('../models/efficientdet_d1_coco17_tpu-32/saved_model')
 
 # preprocess image
-image = load_and_preprocess_image('latest.jpg')
+# image = load_and_preprocess_image('latest.jpg')
 
 # detect objects and return coordinates
 detected_objects = detect_objects(image)
