@@ -151,6 +151,8 @@ def capacity_check() -> str:
                     freie_parkplaetze += 1
 
         # Check if spaces are free
+        if freie_parkplaetze == 1:
+            return "Es ist aktuell noch ein Parkplatz frei"
         if freie_parkplaetze > 0:
             return f"Es sind aktuell noch {freie_parkplaetze} Parkplätze frei"
         else:
