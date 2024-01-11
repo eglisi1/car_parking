@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Occupancy Trends</h1>
+    <form id="trendsForm" action="" method="get">
+        <div class="row">
+            <div class="col-2">
+                <label for="start_date">From Date:</label>
+            </div>
+            <div class="col-2">
+                <input type="datetime-local" id="date_from" name="date_from" value="2024-01-05T00:00">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <label for="start_date">To Date:</label>
+            </div>
+            <div class="col-2">
+                <input type="datetime-local" id="date_to" name="date_to" value="2024-01-12T00:00">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <button type="button" onclick="submitForm('/average_occupancy')">Average Occupancy</button>
+            </div>
+            <div class="col-2">
+                <button type="button" onclick="submitForm('/occupancy_per_day')">Occupancy per Day</button>
+            </div>
+            <div class="col-3">
+                <button type="button" onclick="submitForm('/occupancy_hours_by_parkingspace')">Occupancy per Parking
+                    Space</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function submitForm(action) {
+        var form = document.getElementById('trendsForm');
+        form.action = action;
+        form.submit();
+    }
+</script>
+{% endblock %}
