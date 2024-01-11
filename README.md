@@ -7,7 +7,7 @@
 This project aims to create a model that detects whether a parking space is occupied or not. It's designed for situations where a user is in front of a parking lot, presses a button, and then a camera takes a photo for analysis. The system then provides instructions on where the user should park.
 
 The process is as follows:
-![process](readme_images/use_cases.jpeg)
+![process](readme_resources/use_cases.jpeg)
 
 ## ⚙️ Project Structure
 
