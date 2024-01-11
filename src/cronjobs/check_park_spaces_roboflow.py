@@ -9,8 +9,8 @@ from datetime import datetime
 
 
 def load_model():
-    rf = Roboflow(api_key=os.environ.get('ROBOFLOW_API_KEY'))
-    project = rf.workspace().project('smart-parking-system-uiw5u')
+    rf = Roboflow(api_key=os.environ.get("ROBOFLOW_API_KEY"))
+    project = rf.workspace().project("smart-parking-system-uiw5u")
     return project.version(1).model
 
 
@@ -21,7 +21,7 @@ def load_model():
 
 
 def detect_parking_spaces(model, path):
-    model.predict(path, confidence=60, overlap=30).save('prediction.jpg')
+    model.predict(path, confidence=60, overlap=30).save("prediction.jpg")
     print(model.predict(path, confidence=60, overlap=30).json())
 
     return model.predict(path, confidence=60, overlap=30).json()
@@ -32,16 +32,11 @@ def transform_model_output(model_output):
     offset_y = 57
     cars = []
 
-    for prediction in model_output['predictions']:
-        x1, y1 = prediction['x'] - offset_x, prediction['y'] - offset_y
-        x2, y2 = x1 + prediction['width'], y1 + prediction['height']
+    for prediction in model_output["predictions"]:
+        x1, y1 = prediction["x"] - offset_x, prediction["y"] - offset_y
+        x2, y2 = x1 + prediction["width"], y1 + prediction["height"]
 
-        car_dict = {
-            'xmin': x1,
-            'ymin': y1,
-            'xmax': x2,
-            'ymax': y2
-        }
+        car_dict = {"xmin": x1, "ymin": y1, "xmax": x2, "ymax": y2}
 
         cars.append(car_dict)
 
@@ -49,7 +44,7 @@ def transform_model_output(model_output):
 
 
 def save_to_mongodb(data, username, password, host, database_name, collection_name):
-    uri = f'mongodb+srv://{username}:{password}@{host}/{database_name}?retryWrites=true&w=majority'
+    uri = f"mongodb+srv://{username}:{password}@{host}/{database_name}?retryWrites=true&w=majority"
     client = pymongo.MongoClient(uri)
     db = client[database_name]
     collection = db[collection_name]
@@ -65,19 +60,19 @@ def is_occupied(car, parking_spot):
 def create_parking_status(cars, parking_spots):
     parking_status = []
     for i, spot in enumerate(parking_spots):
-        status = 'Frei'
+        status = "Frei"
         for car in cars:
             if is_occupied(car, spot):
-                status = 'Belegt'
+                status = "Belegt"
                 break
-        parking_status.append({'parkingSpotId': i + 1, 'status': status})
+        parking_status.append({"parkingSpotId": i + 1, "status": status})
 
-    print(f'parking status: {parking_status}')
+    print(f"parking status: {parking_status}")
     return parking_status
 
 
 def check_and_save(detections):
-    cars = [(d['xmin'], d['ymin'], d['xmax'], d['ymax']) for d in detections]
+    cars = [(d["xmin"], d["ymin"], d["xmax"], d["ymax"]) for d in detections]
 
     parking_spots = [
         (935, 181, 945, 191),
@@ -85,33 +80,37 @@ def check_and_save(detections):
         (974, 585, 984, 595),
         (410, 172, 420, 182),
         (397, 366, 407, 376),
-        (377, 584, 387, 594)
+        (377, 584, 387, 594),
     ]
 
     parking_status = create_parking_status(cars, parking_spots)
 
     data_to_save = {
-        '_id': ObjectId(),
-        'timestamp': datetime.now().isoformat(),
-        'parkingSpots': parking_status
+        "_id": ObjectId(),
+        "timestamp": datetime.now().isoformat(),
+        "parkingSpots": parking_status,
     }
 
-    username = os.getenv('MONGO_DB_USERNAME')
-    password = os.getenv('MONGO_DB_PASSWORD')
-    host = 'parkinglot.yba45ot.mongodb.net'
-    database_name = 'parkinglot'
-    collection_name = 'data'
+    username = os.getenv("MONGO_DB_USERNAME")
+    password = os.getenv("MONGO_DB_PASSWORD")
+    host = "parkinglot.yba45ot.mongodb.net"
+    database_name = "parkinglot"
+    collection_name = "data"
 
-    save_to_mongodb(data_to_save, username, password, host, database_name, collection_name)
+    save_to_mongodb(
+        data_to_save, username, password, host, database_name, collection_name
+    )
     print(data_to_save)
-    print(f'Data saved to MongoDB collection \"{collection_name}\" in database \"{database_name}\".')
+    print(
+        f'Data saved to MongoDB collection "{collection_name}" in database "{database_name}".'
+    )
 
 
 model = load_model()
 # take_photo('/home/admin/photos/latest.jpg')
-raw_detections = detect_parking_spaces(model, '../../data/images/latest3.jpg')
+raw_detections = detect_parking_spaces(model, "../../data/images/latest3.jpg")
 detections = transform_model_output(raw_detections)
-print(f'detections: {detections}')
-print(f'detections count: {len(detections)}')
+print(f"detections: {detections}")
+print(f"detections count: {len(detections)}")
 
 check_and_save(detections)

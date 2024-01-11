@@ -34,17 +34,17 @@ def is_occupied(car, parking_spot):
 def create_parking_status(cars, parking_spots):
     parking_status = []
     for i, spot in enumerate(parking_spots):
-        status = 'Frei'
+        status = "Frei"
         for car in cars:
             if is_occupied(car, spot):
-                status = 'Belegt'
+                status = "Belegt"
                 break
-        parking_status.append({'parkingSpotId': i + 1, 'status': status})
+        parking_status.append({"parkingSpotId": i + 1, "status": status})
     return parking_status
 
 
 def save_to_mongodb(data, username, password, host, database_name, collection_name):
-    uri = f'mongodb+srv://{username}:{password}@{host}/{database_name}?retryWrites=true&w=majority'
+    uri = f"mongodb+srv://{username}:{password}@{host}/{database_name}?retryWrites=true&w=majority"
     client = pymongo.MongoClient(uri)
     db = client[database_name]
     collection = db[collection_name]
@@ -52,27 +52,37 @@ def save_to_mongodb(data, username, password, host, database_name, collection_na
 
 
 def check_and_save(detections):
-    cars = [(d['xmin'], d['ymin'], d['xmax'], d['ymax']) for d in detections]
+    cars = [(d["xmin"], d["ymin"], d["xmax"], d["ymax"]) for d in detections]
 
-    parking_spots = [(804, 102, 1076, 270), (818, 275, 1100, 475), (828, 482, 1131, 698),
-                     (283, 83, 548, 271), (260, 269, 545, 473), (229, 488, 535, 690)]
+    parking_spots = [
+        (804, 102, 1076, 270),
+        (818, 275, 1100, 475),
+        (828, 482, 1131, 698),
+        (283, 83, 548, 271),
+        (260, 269, 545, 473),
+        (229, 488, 535, 690),
+    ]
 
     parking_status = create_parking_status(cars, parking_spots)
 
     data_to_save = {
-        '_id': ObjectId(),
-        'timestamp': datetime.now().isoformat(),
-        'parkingSpots': parking_status
+        "_id": ObjectId(),
+        "timestamp": datetime.now().isoformat(),
+        "parkingSpots": parking_status,
     }
 
-    username = os.getenv('MONGO_DB_USERNAME')
-    password = os.getenv('MONGO_DB_PASSWORD')
-    host = 'parkinglot.yba45ot.mongodb.net'
-    database_name = 'parkinglot'
-    collection_name = 'data'
+    username = os.getenv("MONGO_DB_USERNAME")
+    password = os.getenv("MONGO_DB_PASSWORD")
+    host = "parkinglot.yba45ot.mongodb.net"
+    database_name = "parkinglot"
+    collection_name = "data"
 
-    save_to_mongodb(data_to_save, username, password, host, database_name, collection_name)
-    print(f'Data saved to MongoDB collection \"{collection_name}\" in database \"{database_name}\".')
+    save_to_mongodb(
+        data_to_save, username, password, host, database_name, collection_name
+    )
+    print(
+        f'Data saved to MongoDB collection "{collection_name}" in database "{database_name}".'
+    )
 
 
 def detect_objects(image):
@@ -81,15 +91,15 @@ def detect_objects(image):
     class_names = {}
     detected_objects = []
 
-    with open('../models/coco_labels.txt', 'r') as file:
+    with open("../models/coco_labels.txt", "r") as file:
         for i, line in enumerate(file.readlines(), start=1):
             class_names[i] = line.strip()
 
-    boxes = detections['detection_boxes'].numpy()
-    classes = detections['detection_classes'].numpy()
-    scores = detections['detection_scores'].numpy()
+    boxes = detections["detection_boxes"].numpy()
+    classes = detections["detection_classes"].numpy()
+    scores = detections["detection_scores"].numpy()
 
-    original_image = cv2.imread('latest.jpg')
+    original_image = cv2.imread("latest.jpg")
 
     if original_image is None:
         raise ValueError("Image not found or path is incorrect")
@@ -101,7 +111,7 @@ def detect_objects(image):
         if score > 0.5:
             class_id = int(classes[0, i])
             label = class_names.get(class_id, "N/A")
-            if label in ['2  car', '86  scissors']:
+            if label in ["2  car", "86  scissors"]:
                 ymin, xmin, ymax, xmax = boxes[0, i]
                 xmin = int(xmin * width)
                 xmax = int(xmax * width)
@@ -109,10 +119,10 @@ def detect_objects(image):
                 ymax = int(ymax * height)
 
                 detected_object = {
-                    'xmin': xmin,
-                    'ymin': ymin,
-                    'xmax': xmax,
-                    'ymax': ymax
+                    "xmin": xmin,
+                    "ymin": ymin,
+                    "xmax": xmax,
+                    "ymax": ymax,
                 }
 
                 detected_objects.append(detected_object)
@@ -121,7 +131,7 @@ def detect_objects(image):
 
 
 # take a photo
-take_photo('/home/admin/photos/latest.jpg')
+take_photo("/home/admin/photos/latest.jpg")
 
 # load the efficientdet model
 # model = tf.saved_model.load('../models/efficientdet_d1_coco17_tpu-32/saved_model')
