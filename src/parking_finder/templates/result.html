@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
+
 <head>
     <title>{{ title }}</title>
     <style>
@@ -11,16 +12,20 @@
             height: 100vh;
             margin: 0;
         }
+
         form {
             text-align: center;
         }
+
         img {
-            width: 400px; /* Passen Sie die Größe nach Bedarf an */
+            width: 400px;
         }
     </style>
 </head>
+
 <body>
     <h1>{{ title }}</h1>
-    <img src="data:image/png;base64,{{ image_data }}">
+    <img src="data:image/png;base64,{{ image_data }}" alt="Parking instruction">
 </body>
+
 </html>
