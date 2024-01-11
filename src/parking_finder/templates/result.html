@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>{{ title }}</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+
+        form {
+            text-align: center;
+        }
+
+        img {
+            width: 400px;
+            cursor: pointer;
+        }
+
+        .back-button {
+            background-color: #f0f0f0;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+
+        .back-button:before {
+            content: '←';
+            padding-right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>{{ title }}</h1>
+    <a href="/">
+        <img src="data:image/png;base64,{{ image_data }}" alt="Parking instruction">
+    </a>
+    <form action="/" method="get">
+        <button type="submit" class="back-button">Zur&uuml;ck</button>
+    </form>
+</body>
+
+</html>
