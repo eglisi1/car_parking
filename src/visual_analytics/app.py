@@ -47,5 +47,9 @@ def occupancy_hours_by_parkingspace() -> str:
     base64_plot = analysis_service.occupancy_hours_by_parkingspace(date_from, date_to)
     return render_template("occupancy_hours_by_parkingspace_result.html", plot_url=base64_plot)
 
+@app.route("/capacity_check")
+def capacity_check() -> str:
+    return render_template("capacity_check.html", result=analysis_service.capacity_check())
+
 if __name__ == "__main__":
     app.run(debug=True)

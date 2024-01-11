@@ -18,7 +18,9 @@ except Exception as e:
 
 
 def occupancy_trends(date_from: datetime, date_to: datetime) -> str:
-    documents = db_service.get_documents_in_range(mongo_client.collection, date_from, date_to)
+    documents = db_service.get_documents_in_range(
+        mongo_client.collection, date_from, date_to
+    )
     total_parkingspots = len(documents[0]["parkingSpots"]) if documents else 0
     day_period_data = defaultdict(
         lambda: {"total_occupied": 0, "count": 0}
@@ -61,7 +63,9 @@ def occupancy_trends(date_from: datetime, date_to: datetime) -> str:
 
 
 def occupancy_per_day(date_from: datetime, date_to: datetime) -> str:
-    documents = db_service.get_documents_in_range(mongo_client.collection, date_from, date_to)
+    documents = db_service.get_documents_in_range(
+        mongo_client.collection, date_from, date_to
+    )
     average_per_day = calculate_average_per_day(documents)
     return plot_service.create_plot_occupancy_per_day(average_per_day)
 
@@ -114,7 +118,9 @@ def calculate_average_per_day(documents):
 
 
 def occupancy_hours_by_parkingspace(date_from: datetime, date_to: datetime) -> str:
-    documents = db_service.get_documents_in_range(mongo_client.collection, date_from, date_to)
+    documents = db_service.get_documents_in_range(
+        mongo_client.collection, date_from, date_to
+    )
     occupancy_hours = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
 
     for doc in documents:
@@ -129,3 +135,26 @@ def occupancy_hours_by_parkingspace(date_from: datetime, date_to: datetime) -> s
         occupancy_hours[spot_id] /= 4  # 4*15 Minuten = 1 Stunde
 
     return plot_service.create_plot_occupancy_hours_by_parkingspace(occupancy_hours)
+
+
+def capacity_check() -> str:
+    try:
+        letzter_datensatz = (
+            mongo_client.collection.find().sort("timestamp", -1).limit(1)
+        )
+
+        # count empty parking spaces
+        freie_parkplaetze = 0
+        for datensatz in letzter_datensatz:
+            for parkplatz in datensatz["parkingSpots"]:
+                if parkplatz["status"] == "Frei":
+                    freie_parkplaetze += 1
+
+        # Check if spaces are free
+        if freie_parkplaetze > 0:
+            return f"Es sind aktuell noch {freie_parkplaetze} Parkplätze frei"
+        else:
+            return "Es hat keine freien Parkplätze"
+
+    except Exception as e:
+        return f"Fehler bei der Verbindung: {e}"
