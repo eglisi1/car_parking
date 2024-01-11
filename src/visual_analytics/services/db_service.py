@@ -45,3 +45,6 @@ def get_documents_in_range(collection, date_from: datetime, date_to: datetime):
             }
         }
     )
+
+def get_last_document(collection):
+    return collection.find().sort("timestamp", -1).limit(1)
