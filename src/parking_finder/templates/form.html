@@ -38,8 +38,14 @@
     </form>
 
     <script>
-        document.getElementById('form').addEventListener('submit', function () {
+        document.getElementById('form').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevents the form from submitting immediately
             document.body.style.cursor = 'wait';
+
+            // Delay form submission by 500 milliseconds
+            setTimeout(function () {
+                document.getElementById('form').submit();
+            }, 500);
         });
     </script>
 </body>
