@@ -5,7 +5,7 @@ import base64
 from flask import render_template
 
 try:
-    from picamera import picamera
+    import picamera
 except ImportError:
     print("Solely working on pi. But we got you covered.")
 
@@ -39,9 +39,12 @@ images_path = "../../data/images/"
 
 
 def take_photo(path: str):
-    with picamera.PiCamera() as camera:
+    camera = picamera.PiCamera()
+    try:
         time.sleep(2)
         camera.capture(path)
+    finally:
+        camera.close()
 
 
 def is_raspberry_pi():
@@ -106,7 +109,7 @@ def transform_model_output(model_output: PredictionGroup) -> List[Dict]:
     return cars
 
 
-def find_nearest_free_spot(parking_status: List) -> str | None:
+def find_nearest_free_spot(parking_status: List):
     for spot in parking_order:
         if parking_status[int(spot[1:]) - 1]["status"] == "Frei":
             return spot
