@@ -29,8 +29,9 @@ To set up this project:
 
 1. Clone the repository.
 2. Install dependencies using ```pip install -r requirements.txt``` from the root directory.
-3. Start the app with uvicorn ```uvicorn main:app --reload``` from the src/backend directory.
-4. Profit 💰
+3. (If you're on a RaspberryPI run ```pip install -r pi_requirements.txt```. This won't work on Windows!)
+4. Start the app with uvicorn ```uvicorn main:app --reload``` from the src/backend directory.
+5. Profit 💰
 
 ## 🐍 Python Version
 
