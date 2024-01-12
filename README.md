@@ -24,4 +24,4 @@ To set up this project:
 
 ## 🐍 Python Version
 
-This project is built with Python 3.0.1.
+This project is built with Python 3.9.1.
